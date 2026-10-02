@@ -16,10 +16,7 @@
   <title>Manantial KIDS</title>
 
 
-  <!--
-    LECTOR QR
-    Librería para utilizar la cámara del celular.
-  -->
+  <!-- LECTOR QR -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 
@@ -59,8 +56,6 @@
       padding: 15px 12px 30px;
     }
 
-
-    /* Decoraciones */
 
     .forma {
       position: fixed;
@@ -484,9 +479,7 @@
   <div class="contenedor">
 
 
-    <!-- ===================================================
-         LOGO
-         =================================================== -->
+    <!-- LOGO -->
 
     <div class="logo">
 
@@ -501,9 +494,7 @@
     </div>
 
 
-    <!-- ===================================================
-         TITULO
-         =================================================== -->
+    <!-- TITULO -->
 
     <div class="titulo">
 
@@ -514,16 +505,12 @@
     </div>
 
 
-    <!-- ===================================================
-         TARJETA
-         =================================================== -->
+    <!-- TARJETA -->
 
     <div class="tarjeta">
 
 
-      <!-- =================================================
-           ESCANER
-           ================================================= -->
+      <!-- ESCANER -->
 
       <div id="zonaScanner">
 
@@ -555,16 +542,12 @@
       </div>
 
 
-      <!-- =================================================
-           ERROR
-           ================================================= -->
+      <!-- ERROR -->
 
       <div id="error"></div>
 
 
-      <!-- =================================================
-           INFORMACION DEL NIÑO
-           ================================================= -->
+      <!-- INFORMACION -->
 
       <div id="contenido">
 
@@ -727,7 +710,7 @@
       </div>
 
 
-  </div>
+    </div>
 
 
     <div class="pie">
@@ -778,7 +761,6 @@
 
       /*
        * Si el QR actual abre una URL con ?data=
-       * también podremos probarlo directamente.
        */
 
       const parametros =
@@ -816,14 +798,15 @@
     );
 
 
-    document.getElementById(
-      "btnCamara"
-    ).disabled = true;
+    const btnCamara =
+      document.getElementById(
+        "btnCamara"
+      );
 
 
-    document.getElementById(
-      "btnCamara"
-    ).textContent =
+    btnCamara.disabled = true;
+
+    btnCamara.textContent =
       "ACTIVANDO CÁMARA...";
 
 
@@ -836,7 +819,34 @@
         "No se pudo cargar el lector QR."
       );
 
+      btnCamara.disabled = false;
+
+      btnCamara.textContent =
+        "📷 ACTIVAR CÁMARA";
+
       return;
+
+    }
+
+
+    /*
+     * Si ya existe un lector anterior,
+     * intentamos limpiarlo antes de crear otro.
+     */
+
+    if (lectorQR) {
+
+      try {
+
+        lectorQR.clear();
+
+      } catch (error) {
+
+        console.log(
+          "No fue necesario limpiar lector anterior."
+        );
+
+      }
 
     }
 
@@ -905,7 +915,9 @@
 
 
           if (procesandoQR) {
+
             return;
+
           }
 
 
@@ -924,10 +936,8 @@
         function(error) {
 
           /*
-           * No mostramos estos errores.
-           *
-           * El lector los genera continuamente
-           * mientras busca un QR.
+           * Estos errores son normales mientras
+           * la cámara está buscando un QR.
            */
 
         }
@@ -939,9 +949,7 @@
         camaraActiva = true;
 
 
-        document.getElementById(
-          "btnCamara"
-        ).style.display =
+        btnCamara.style.display =
           "none";
 
 
@@ -959,14 +967,14 @@
         );
 
 
-        document.getElementById(
-          "btnCamara"
-        ).disabled = false;
+        camaraActiva = false;
 
 
-        document.getElementById(
-          "btnCamara"
-        ).textContent =
+        btnCamara.disabled =
+          false;
+
+
+        btnCamara.textContent =
           "📷 ACTIVAR CÁMARA";
 
 
@@ -1044,12 +1052,7 @@
 
       /*
        * CASO 1
-       *
-       * El QR contiene directamente JSON.
-       *
-       * Ejemplo:
-       *
-       * {"id":"MK001",...}
+       * QR contiene directamente JSON.
        */
 
       if (
@@ -1064,10 +1067,7 @@
 
       /*
        * CASO 2
-       *
-       * El QR contiene nuestra URL:
-       *
-       * ...?data={JSON}
+       * QR contiene URL con ?data=
        */
 
       else {
@@ -1210,6 +1210,32 @@
 
 
       /*
+       * Restaurar botones
+       */
+
+      document.getElementById(
+        "btnIngreso"
+      ).disabled = false;
+
+
+      document.getElementById(
+        "btnSalida"
+      ).disabled = false;
+
+
+      document.getElementById(
+        "btnIngreso"
+      ).textContent =
+        "INGRESO";
+
+
+      document.getElementById(
+        "btnSalida"
+      ).textContent =
+        "SALIDA";
+
+
+      /*
        * CAMBIAR PANTALLA
        */
 
@@ -1244,6 +1270,9 @@
       );
 
 
+      procesandoQR = false;
+
+
       mostrarError(
         error.message ||
         "No fue posible leer el código QR."
@@ -1265,6 +1294,21 @@
     );
 
 
+    /*
+     * Detener cámara anterior si todavía
+     * estuviera activa.
+     */
+
+    if (
+      lectorQR &&
+      camaraActiva
+    ) {
+
+      detenerCamara();
+
+    }
+
+
     datosQR = null;
 
     procesandoQR = false;
@@ -1281,6 +1325,16 @@
 
 
     /*
+     * Limpiar error.
+     */
+
+    document.getElementById(
+      "error"
+    ).style.display =
+      "none";
+
+
+    /*
      * Limpiar condición.
      */
 
@@ -1289,6 +1343,32 @@
     ).classList.remove(
       "alerta"
     );
+
+
+    /*
+     * Restaurar botones.
+     */
+
+    document.getElementById(
+      "btnIngreso"
+    ).disabled = false;
+
+
+    document.getElementById(
+      "btnSalida"
+    ).disabled = false;
+
+
+    document.getElementById(
+      "btnIngreso"
+    ).textContent =
+      "INGRESO";
+
+
+    document.getElementById(
+      "btnSalida"
+    ).textContent =
+      "SALIDA";
 
 
     /*
@@ -1302,301 +1382,366 @@
 
 
     document.getElementById(
-      "error"
-    ).style.display =
-      "none";
-
-
-    document.getElementById(
       "zonaScanner"
     ).style.display =
       "block";
 
 
     /*
-     * Activar cámara.
+     * Botón de cámara.
      */
 
-    activarCamara();
+    const btnCamara =
+      document.getElementById(
+        "btnCamara"
+      );
+
+
+    btnCamara.disabled =
+      false;
+
+
+    btnCamara.textContent =
+      "📷 ACTIVAR CÁMARA";
+
+
+    btnCamara.style.display =
+      "block";
+
+
+    /*
+     * Activar cámara automáticamente.
+     */
+
+    setTimeout(
+      function() {
+
+        activarCamara();
+
+      },
+      300
+    );
 
   }
 
 
   /* =========================================================
-     REGISTRAR
-     
-     POR AHORA NO GUARDA.
-     
-     En este primer paso solo mostramos un mensaje.
-     
-     En el siguiente paso conectaremos esto con
-     Google Apps Script.
+     REGISTRAR INGRESO / SALIDA
      ========================================================= */
 
-  /*************************************************
- REGISTRAR INGRESO / SALIDA
-*************************************************/
-
-function registrar(
-  movimiento
-) {
-
-  console.log(
-    "================================"
-  );
-
-  console.log(
-    "MOVIMIENTO:",
+  function registrar(
     movimiento
-  );
-
-
-  /*
-   * Validar que exista información del QR
-   */
-
-  if (
-    !datosQR ||
-    !datosQR.id
   ) {
 
-    mostrarMensaje(
-      "No existe un ID válido.",
-      false
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * Evitar doble clic
-   */
-
-  const btnIngreso =
-    document.getElementById(
-      "btnIngreso"
-    );
-
-  const btnSalida =
-    document.getElementById(
-      "btnSalida"
+    console.log(
+      "Movimiento seleccionado:",
+      movimiento
     );
 
 
-  btnIngreso.disabled = true;
+    /*
+     * Validar QR
+     */
 
-  btnSalida.disabled = true;
+    if (
+      !datosQR ||
+      !datosQR.id
+    ) {
 
+      mostrarMensaje(
+        "No existe un ID válido.",
+        false
+      );
 
-  /*
-   * Mostrar mensaje de espera
-   */
+      return;
 
-  mostrarMensaje(
-    "⏳ Registrando " +
-    movimiento.toLowerCase() +
-    "...",
-    true
-  );
-
-
-  /*
-   * URL DEL WEB APP DE APPS SCRIPT
-   */
-
-  const WEB_APP_URL =
-    "https://script.google.com/macros/s/AKfycbxvcJlt70JdHMvmSXTAWMEFdSMAGroehCrpNSQaJeL60p1OxNHHIfOhNT1VnDhKhUHE/exec";
+    }
 
 
-  /*
-   * Crear nombre único para callback
-   */
+    /*
+     * Obtener botones
+     */
 
-  const callbackName =
-    "mkidsCallback_" +
-    Date.now();
-
-
-  /*
-   * Crear función global temporal
-   */
-
-  window[callbackName] =
-    function(resultado) {
-
-      console.log(
-        "RESPUESTA DEL SERVIDOR:",
-        resultado
+    const btnIngreso =
+      document.getElementById(
+        "btnIngreso"
       );
 
 
-      /*
-       * Eliminar función temporal
-       */
-
-      delete window[callbackName];
-
-
-      /*
-       * Eliminar script temporal
-       */
-
-      const script =
-        document.getElementById(
-          callbackName
-        );
+    const btnSalida =
+      document.getElementById(
+        "btnSalida"
+      );
 
 
-      if (script) {
+    /*
+     * Bloquear inmediatamente.
+     *
+     * Esto evita doble clic.
+     */
 
-        script.remove();
+    btnIngreso.disabled =
+      true;
 
-      }
+
+    btnSalida.disabled =
+      true;
 
 
-      /*
-       * Resultado correcto
-       */
+    /*
+     * Mostrar GUARDANDO...
+     */
 
-      if (
-        resultado &&
-        resultado.ok
-      ) {
+    if (
+      movimiento === "INGRESO"
+    ) {
 
-        mostrarMensaje(
-          resultado.mensaje,
-          true
+      btnIngreso.textContent =
+        "GUARDANDO...";
+
+    } else {
+
+      btnSalida.textContent =
+        "GUARDANDO...";
+
+    }
+
+
+    /*
+     * URL DEL WEB APP
+     */
+
+    const WEB_APP_URL =
+      "https://script.google.com/macros/s/AKfycbxvcJlt70JdHMvmSXTAWMEFdSMAGroehCrpNSQaJeL60p1OxNHHIfOhNT1VnDhKhUHE/exec";
+
+
+    /*
+     * Nombre único para JSONP
+     */
+
+    const callbackName =
+      "mkidsCallback_" +
+      Date.now();
+
+
+    /*
+     * Crear script
+     */
+
+    const script =
+      document.createElement(
+        "script"
+      );
+
+
+    /*
+     * Callback
+     */
+
+    window[callbackName] =
+      function(respuesta) {
+
+        console.log(
+          "Respuesta del servidor:",
+          respuesta
         );
 
 
         /*
-         * Mantener botones bloqueados
-         * para evitar registrar dos veces
+         * Eliminar callback
          */
 
-        btnIngreso.disabled = true;
+        try {
 
-        btnSalida.disabled = true;
+          delete window[
+            callbackName
+          ];
+
+        } catch (error) {
+
+          window[
+            callbackName
+          ] = undefined;
+
+        }
 
 
-        console.log(
-          "✅ MOVIMIENTO REGISTRADO"
+        /*
+         * Eliminar script
+         */
+
+        if (script) {
+
+          script.remove();
+
+        }
+
+
+        /*
+         * Si se guardó correctamente
+         */
+
+        if (
+          respuesta &&
+          respuesta.ok
+        ) {
+
+          mostrarMensaje(
+            respuesta.mensaje,
+            true
+          );
+
+
+          /*
+           * Esperar un segundo para que
+           * se vea la confirmación.
+           */
+
+          setTimeout(
+            function() {
+
+              nuevoQR();
+
+            },
+            1000
+          );
+
+
+        } else {
+
+          /*
+           * Hubo un error.
+           * Volvemos a activar botones.
+           */
+
+          btnIngreso.disabled =
+            false;
+
+
+          btnSalida.disabled =
+            false;
+
+
+          btnIngreso.textContent =
+            "INGRESO";
+
+
+          btnSalida.textContent =
+            "SALIDA";
+
+
+          mostrarMensaje(
+
+            respuesta &&
+            respuesta.mensaje
+
+              ?
+
+            respuesta.mensaje
+
+              :
+
+            "No fue posible registrar el movimiento.",
+
+            false
+
+          );
+
+        }
+
+      };
+
+
+    /*
+     * Construir URL
+     */
+
+    script.src =
+      WEB_APP_URL +
+      "?action=registrar" +
+      "&id=" +
+      encodeURIComponent(
+        datosQR.id
+      ) +
+      "&movimiento=" +
+      encodeURIComponent(
+        movimiento
+      ) +
+      "&callback=" +
+      encodeURIComponent(
+        callbackName
+      );
+
+
+    /*
+     * Error de comunicación
+     */
+
+    script.onerror =
+      function() {
+
+        console.error(
+          "❌ Error comunicando con Apps Script."
         );
 
 
-        return;
+        try {
 
-      }
+          delete window[
+            callbackName
+          ];
+
+        } catch (error) {
+
+          window[
+            callbackName
+          ] = undefined;
+
+        }
 
 
-      /*
-       * Error o duplicado
-       */
+        /*
+         * Restaurar botones
+         */
 
-      mostrarMensaje(
-        resultado &&
-        resultado.mensaje
-          ? resultado.mensaje
-          : "No fue posible registrar el movimiento.",
-        false
+        btnIngreso.disabled =
+          false;
+
+
+        btnSalida.disabled =
+          false;
+
+
+        btnIngreso.textContent =
+          "INGRESO";
+
+
+        btnSalida.textContent =
+          "SALIDA";
+
+
+        mostrarMensaje(
+
+          "❌ No fue posible comunicarse con el sistema.",
+
+          false
+
+        );
+
+      };
+
+
+    /*
+     * Enviar solicitud
+     */
+
+    document
+      .body
+      .appendChild(
+        script
       );
 
-
-      /*
-       * Permitir volver a intentar
-       */
-
-      btnIngreso.disabled = false;
-
-      btnSalida.disabled = false;
-
-
-      console.log(
-        "⚠️ NO SE REGISTRÓ:",
-        resultado
-      );
-
-    };
-
-
-  /*
-   * Crear solicitud JSONP
-   */
-
-  const script =
-    document.createElement(
-      "script"
-    );
-
-
-  script.id =
-    callbackName;
-
-
-  script.src =
-    WEB_APP_URL +
-    "?action=registrar" +
-    "&id=" +
-    encodeURIComponent(
-      datosQR.id
-    ) +
-    "&movimiento=" +
-    encodeURIComponent(
-      movimiento
-    ) +
-    "&callback=" +
-    encodeURIComponent(
-      callbackName
-    );
-
-
-  /*
-   * Si ocurre un error de conexión
-   */
-
-  script.onerror =
-    function() {
-
-      console.error(
-        "❌ Error comunicando con Apps Script."
-      );
-
-
-      delete window[callbackName];
-
-
-      script.remove();
-
-
-      mostrarMensaje(
-        "❌ No fue posible comunicarse con el sistema. Intenta nuevamente.",
-        false
-      );
-
-
-      btnIngreso.disabled = false;
-
-      btnSalida.disabled = false;
-
-    };
-
-
-  /*
-   * Enviar solicitud
-   */
-
-  document.body.appendChild(
-    script
-  );
-
-
-  console.log(
-    "Solicitud enviada a Apps Script."
-  );
-
-}
+  }
 
 
   /* =========================================================
