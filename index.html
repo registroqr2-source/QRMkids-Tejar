@@ -1333,51 +1333,270 @@
      Google Apps Script.
      ========================================================= */
 
-  function registrar(
+  /*************************************************
+ REGISTRAR INGRESO / SALIDA
+*************************************************/
+
+function registrar(
+  movimiento
+) {
+
+  console.log(
+    "================================"
+  );
+
+  console.log(
+    "MOVIMIENTO:",
     movimiento
+  );
+
+
+  /*
+   * Validar que exista información del QR
+   */
+
+  if (
+    !datosQR ||
+    !datosQR.id
   ) {
 
-    console.log(
-      "Movimiento seleccionado:",
-      movimiento
+    mostrarMensaje(
+      "No existe un ID válido.",
+      false
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Evitar doble clic
+   */
+
+  const btnIngreso =
+    document.getElementById(
+      "btnIngreso"
+    );
+
+  const btnSalida =
+    document.getElementById(
+      "btnSalida"
     );
 
 
-    if (
-      !datosQR ||
-      !datosQR.id
-    ) {
+  btnIngreso.disabled = true;
+
+  btnSalida.disabled = true;
+
+
+  /*
+   * Mostrar mensaje de espera
+   */
+
+  mostrarMensaje(
+    "⏳ Registrando " +
+    movimiento.toLowerCase() +
+    "...",
+    true
+  );
+
+
+  /*
+   * URL DEL WEB APP DE APPS SCRIPT
+   */
+
+  const WEB_APP_URL =
+    "https://script.google.com/macros/s/AKfycbxvcJlt70JdHMvmSXTAWMEFdSMAGroehCrpNSQaJeL60p1OxNHHIfOhNT1VnDhKhUHE/exec";
+
+
+  /*
+   * Crear nombre único para callback
+   */
+
+  const callbackName =
+    "mkidsCallback_" +
+    Date.now();
+
+
+  /*
+   * Crear función global temporal
+   */
+
+  window[callbackName] =
+    function(resultado) {
+
+      console.log(
+        "RESPUESTA DEL SERVIDOR:",
+        resultado
+      );
+
+
+      /*
+       * Eliminar función temporal
+       */
+
+      delete window[callbackName];
+
+
+      /*
+       * Eliminar script temporal
+       */
+
+      const script =
+        document.getElementById(
+          callbackName
+        );
+
+
+      if (script) {
+
+        script.remove();
+
+      }
+
+
+      /*
+       * Resultado correcto
+       */
+
+      if (
+        resultado &&
+        resultado.ok
+      ) {
+
+        mostrarMensaje(
+          resultado.mensaje,
+          true
+        );
+
+
+        /*
+         * Mantener botones bloqueados
+         * para evitar registrar dos veces
+         */
+
+        btnIngreso.disabled = true;
+
+        btnSalida.disabled = true;
+
+
+        console.log(
+          "✅ MOVIMIENTO REGISTRADO"
+        );
+
+
+        return;
+
+      }
+
+
+      /*
+       * Error o duplicado
+       */
 
       mostrarMensaje(
-        "No existe un ID válido.",
+        resultado &&
+        resultado.mensaje
+          ? resultado.mensaje
+          : "No fue posible registrar el movimiento.",
         false
       );
 
-      return;
 
-    }
+      /*
+       * Permitir volver a intentar
+       */
+
+      btnIngreso.disabled = false;
+
+      btnSalida.disabled = false;
 
 
-    mostrarMensaje(
+      console.log(
+        "⚠️ NO SE REGISTRÓ:",
+        resultado
+      );
 
-      movimiento +
-      " seleccionado para " +
-      datosQR.nombre +
-      ".",
+    };
 
-      true
 
+  /*
+   * Crear solicitud JSONP
+   */
+
+  const script =
+    document.createElement(
+      "script"
     );
 
 
-    /*
-     * NO GUARDAMOS TODAVÍA.
-     *
-     * Primero comprobamos que GitHub + cámara + QR
-     * funcionan correctamente.
-     */
+  script.id =
+    callbackName;
 
-  }
+
+  script.src =
+    WEB_APP_URL +
+    "?action=registrar" +
+    "&id=" +
+    encodeURIComponent(
+      datosQR.id
+    ) +
+    "&movimiento=" +
+    encodeURIComponent(
+      movimiento
+    ) +
+    "&callback=" +
+    encodeURIComponent(
+      callbackName
+    );
+
+
+  /*
+   * Si ocurre un error de conexión
+   */
+
+  script.onerror =
+    function() {
+
+      console.error(
+        "❌ Error comunicando con Apps Script."
+      );
+
+
+      delete window[callbackName];
+
+
+      script.remove();
+
+
+      mostrarMensaje(
+        "❌ No fue posible comunicarse con el sistema. Intenta nuevamente.",
+        false
+      );
+
+
+      btnIngreso.disabled = false;
+
+      btnSalida.disabled = false;
+
+    };
+
+
+  /*
+   * Enviar solicitud
+   */
+
+  document.body.appendChild(
+    script
+  );
+
+
+  console.log(
+    "Solicitud enviada a Apps Script."
+  );
+
+}
 
 
   /* =========================================================
