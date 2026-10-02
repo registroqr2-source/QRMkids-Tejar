@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <meta
+    name="theme-color"
+    content="#ffbd00">
+
+  <title>Manantial KIDS</title>
+
+
+  <!--
+    LECTOR QR
+    Librería para utilizar la cámara del celular.
+  -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+
+    body {
+      background: #ffbd00;
+      color: #3732a3;
+    }
+
+
+    /* =====================================================
+       FONDO
+       ===================================================== */
+
+    .pagina {
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      padding: 15px 12px 30px;
+    }
+
+
+    /* Decoraciones */
+
+    .forma {
+      position: fixed;
+      z-index: 0;
+      background: #3732a3;
+      pointer-events: none;
+    }
+
+
+    .forma-1 {
+      width: 115px;
+      height: 175px;
+      top: -75px;
+      left: -35px;
+      border-radius: 0 0 100px 0;
+    }
+
+
+    .forma-2 {
+      width: 105px;
+      height: 160px;
+      top: -65px;
+      right: -35px;
+      border-radius: 0 0 0 90px;
+    }
+
+
+    .forma-3 {
+      width: 120px;
+      height: 145px;
+      bottom: -55px;
+      left: -45px;
+      border-radius: 0 100px 0 0;
+    }
+
+
+    .forma-4 {
+      width: 120px;
+      height: 145px;
+      bottom: -55px;
+      right: -45px;
+      border-radius: 100px 0 0 0;
+    }
+
+
+    /* =====================================================
+       CONTENEDOR
+       ===================================================== */
+
+    .contenedor {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+
+    /* =====================================================
+       LOGO
+       ===================================================== */
+
+    .logo {
+      text-align: center;
+      color: #3732a3;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      font-weight: 900;
+    }
+
+
+    .logo-manantial {
+      display: block;
+      font-family: cursive;
+      font-size: 25px;
+      line-height: 22px;
+      transform: rotate(-2deg);
+    }
+
+
+    .logo-kids {
+      display: block;
+      font-size: 56px;
+      line-height: 53px;
+      letter-spacing: -4px;
+      font-weight: 900;
+    }
+
+
+    /* =====================================================
+       TITULO
+       ===================================================== */
+
+    .titulo {
+      text-align: center;
+      color: #3732a3;
+      font-size: 20px;
+      line-height: 1.25;
+      margin: 12px auto 18px;
+    }
+
+
+    .titulo strong {
+      font-weight: 900;
+    }
+
+
+    /* =====================================================
+       TARJETA
+       ===================================================== */
+
+    .tarjeta {
+      width: 100%;
+      background: rgba(255,255,255,0.97);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.18);
+    }
+
+
+    /* =====================================================
+       ESCÁNER
+       ===================================================== */
+
+    #zonaScanner {
+      display: block;
+    }
+
+
+    .tituloScanner {
+      text-align: center;
+      color: #3732a3;
+      font-size: 20px;
+      font-weight: 900;
+      margin-bottom: 15px;
+    }
+
+
+    #reader {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #111;
+    }
+
+
+    #reader video {
+      width: 100% !important;
+      height: auto !important;
+      border-radius: 18px;
+    }
+
+
+    #reader__dashboard {
+      display: none !important;
+    }
+
+
+    .instruccion {
+      text-align: center;
+      color: #555;
+      font-size: 14px;
+      margin-top: 13px;
+      line-height: 1.4;
+    }
+
+
+    /* =====================================================
+       BOTON ACTIVAR CAMARA
+       ===================================================== */
+
+    .btnCamara {
+      width: 100%;
+      background: #3732a3;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      min-height: 58px;
+      font-size: 18px;
+      font-weight: 900;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+
+    .btnCamara:active {
+      transform: scale(0.98);
+    }
+
+
+    /* =====================================================
+       INFORMACION
+       ===================================================== */
+
+    #contenido {
+      display: none;
+    }
+
+
+    .nombre {
+      text-align: center;
+      color: #3732a3;
+      font-size: 29px;
+      line-height: 1.15;
+      font-weight: 900;
+      margin: 2px 0 20px;
+      word-break: break-word;
+    }
+
+
+    .campo {
+      margin-bottom: 13px;
+    }
+
+
+    .etiqueta {
+      display: block;
+      color: #777;
+      font-size: 11px;
+      font-weight: 900;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+
+    .valor {
+      background: #f4f4f4;
+      color: #333;
+      border-radius: 11px;
+      padding: 11px 12px;
+      min-height: 43px;
+      font-size: 17px;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+
+    /* =====================================================
+       CONDICION MEDICA
+       ===================================================== */
+
+    #bloqueCondicion.alerta .valor {
+      background: #fff0a8;
+      color: #3732a3;
+      border: 2px solid #ffbd00;
+      font-weight: 900;
+    }
+
+
+    /* =====================================================
+       BOTONES
+       ===================================================== */
+
+    .botones {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+
+    button {
+      border: none;
+      border-radius: 14px;
+      min-height: 58px;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+
+    .btnIngreso {
+      flex: 1;
+      background: #198754;
+      color: white;
+    }
+
+
+    .btnSalida {
+      flex: 1;
+      background: #dc3545;
+      color: white;
+    }
+
+
+    /* =====================================================
+       OTRO QR
+       ===================================================== */
+
+    .btnOtro {
+      width: 100%;
+      background: #3732a3;
+      color: white;
+      margin-top: 14px;
+    }
+
+
+    /* =====================================================
+       MENSAJE
+       ===================================================== */
+
+    #mensaje {
+      display: none;
+      margin-top: 15px;
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+
+    .exito {
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+
+    .errorMensaje {
+      background: #f8d7da;
+      color: #842029;
+    }
+
+
+    /* =====================================================
+       ERROR
+       ===================================================== */
+
+    #error {
+      display: none;
+      background: #f8d7da;
+      color: #842029;
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: 900;
+      line-height: 1.4;
+    }
+
+
+    /* =====================================================
+       PIE
+       ===================================================== */
+
+    .pie {
+      text-align: center;
+      color: #3732a3;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+
+    /* =====================================================
+       CELULARES PEQUEÑOS
+       ===================================================== */
+
+    @media (max-width: 380px) {
+
+      .pagina {
+        padding: 10px 9px 25px;
+      }
+
+      .logo-kids {
+        font-size: 49px;
+      }
+
+      .logo-manantial {
+        font-size: 22px;
+      }
+
+      .titulo {
+        font-size: 18px;
+      }
+
+      .tarjeta {
+        padding: 14px;
+        border-radius: 20px;
+      }
+
+      .nombre {
+        font-size: 24px;
+      }
+
+      .valor {
+        font-size: 16px;
+      }
+
+      button {
+        font-size: 15px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="pagina">
+
+
+  <!-- DECORACIONES -->
+
+  <div class="forma forma-1"></div>
+  <div class="forma forma-2"></div>
+  <div class="forma forma-3"></div>
+  <div class="forma forma-4"></div>
+
+
+  <div class="contenedor">
+
+
+    <!-- ===================================================
+         LOGO
+         =================================================== -->
+
+    <div class="logo">
+
+      <span class="logo-manantial">
+        Manantial
+      </span>
+
+      <span class="logo-kids">
+        KIDS
+      </span>
+
+    </div>
+
+
+    <!-- ===================================================
+         TITULO
+         =================================================== -->
+
+    <div class="titulo">
+
+      <strong>Control de ingreso y salida</strong><br>
+
+      Iglesia Infantil
+
+    </div>
+
+
+    <!-- ===================================================
+         TARJETA
+         =================================================== -->
+
+    <div class="tarjeta">
+
+
+      <!-- =================================================
+           ESCANER
+           ================================================= -->
+
+      <div id="zonaScanner">
+
+        <div class="tituloScanner">
+          📷 Escanea el código QR
+        </div>
+
+
+        <div id="reader"></div>
+
+
+        <div class="instruccion">
+
+          Permite el acceso a la cámara cuando<br>
+          el navegador lo solicite.
+
+        </div>
+
+
+        <button
+          class="btnCamara"
+          id="btnCamara"
+          onclick="activarCamara()">
+
+          📷 ACTIVAR CÁMARA
+
+        </button>
+
+      </div>
+
+
+      <!-- =================================================
+           ERROR
+           ================================================= -->
+
+      <div id="error"></div>
+
+
+      <!-- =================================================
+           INFORMACION DEL NIÑO
+           ================================================= -->
+
+      <div id="contenido">
+
+
+        <div
+          class="nombre"
+          id="nombre">
+
+          -
+
+        </div>
+
+
+        <div class="campo">
+
+          <span class="etiqueta">
+            ID MKIDS
+          </span>
+
+          <div
+            class="valor"
+            id="id">
+
+            -
+
+          </div>
+
+        </div>
+
+
+        <div class="campo">
+
+          <span class="etiqueta">
+            Acudiente
+          </span>
+
+          <div
+            class="valor"
+            id="acudiente">
+
+            -
+
+          </div>
+
+        </div>
+
+
+        <div class="campo">
+
+          <span class="etiqueta">
+            Edad
+          </span>
+
+          <div
+            class="valor"
+            id="edad">
+
+            -
+
+          </div>
+
+        </div>
+
+
+        <div class="campo">
+
+          <span class="etiqueta">
+            Tipo de sangre
+          </span>
+
+          <div
+            class="valor"
+            id="sangre">
+
+            -
+
+          </div>
+
+        </div>
+
+
+        <div class="campo">
+
+          <span class="etiqueta">
+            EPS
+          </span>
+
+          <div
+            class="valor"
+            id="eps">
+
+            -
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="campo"
+          id="bloqueCondicion">
+
+          <span class="etiqueta">
+            Discapacidad / condición médica
+          </span>
+
+          <div
+            class="valor"
+            id="condicion">
+
+            Ninguna
+
+          </div>
+
+        </div>
+
+
+        <!-- BOTONES -->
+
+        <div class="botones">
+
+          <button
+            id="btnIngreso"
+            class="btnIngreso"
+            onclick="registrar('INGRESO')">
+
+            INGRESO
+
+          </button>
+
+
+          <button
+            id="btnSalida"
+            class="btnSalida"
+            onclick="registrar('SALIDA')">
+
+            SALIDA
+
+          </button>
+
+        </div>
+
+
+        <!-- MENSAJE -->
+
+        <div id="mensaje"></div>
+
+
+        <!-- OTRO QR -->
+
+        <button
+          class="btnOtro"
+          onclick="nuevoQR()">
+
+          📷 ESCANEAR OTRO QR
+
+        </button>
+
+
+      </div>
+
+
+  </div>
+
+
+    <div class="pie">
+
+      Sistema MKIDS
+
+    </div>
+
+
+  </div>
+
+</div>
+
+
+<script>
+
+
+  /* =========================================================
+     VARIABLES
+     ========================================================= */
+
+  let lectorQR = null;
+
+  let camaraActiva = false;
+
+  let procesandoQR = false;
+
+  let datosQR = null;
+
+
+  /* =========================================================
+     INICIAR
+     ========================================================= */
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+      console.log(
+        "MKIDS GitHub iniciado."
+      );
+
+      console.log(
+        "URL:",
+        window.location.href
+      );
+
+
+      /*
+       * Si el QR actual abre una URL con ?data=
+       * también podremos probarlo directamente.
+       */
+
+      const parametros =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      const data =
+        parametros.get("data");
+
+
+      if (data) {
+
+        console.log(
+          "QR recibido mediante URL."
+        );
+
+        procesarQR(data);
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     ACTIVAR CAMARA
+     ========================================================= */
+
+  function activarCamara() {
+
+    console.log(
+      "Solicitando acceso a cámara..."
+    );
+
+
+    document.getElementById(
+      "btnCamara"
+    ).disabled = true;
+
+
+    document.getElementById(
+      "btnCamara"
+    ).textContent =
+      "ACTIVANDO CÁMARA...";
+
+
+    if (
+      typeof Html5Qrcode ===
+      "undefined"
+    ) {
+
+      mostrarError(
+        "No se pudo cargar el lector QR."
+      );
+
+      return;
+
+    }
+
+
+    lectorQR =
+      new Html5Qrcode(
+        "reader"
+      );
+
+
+    const configuracion = {
+
+      fps: 10,
+
+      qrbox: function(
+        ancho,
+        alto
+      ) {
+
+        const tamaño =
+          Math.min(
+            ancho,
+            alto
+          ) * 0.70;
+
+
+        return {
+
+          width: tamaño,
+
+          height: tamaño
+
+        };
+
+      }
+
+    };
+
+
+    lectorQR
+      .start(
+
+        {
+          facingMode: "environment"
+        },
+
+        configuracion,
+
+        function(textoQR) {
+
+          console.log(
+            "================================"
+          );
+
+          console.log(
+            "QR DETECTADO:"
+          );
+
+          console.log(
+            textoQR
+          );
+
+          console.log(
+            "================================"
+          );
+
+
+          if (procesandoQR) {
+            return;
+          }
+
+
+          procesandoQR = true;
+
+
+          detenerCamara();
+
+
+          procesarQR(
+            textoQR
+          );
+
+        },
+
+        function(error) {
+
+          /*
+           * No mostramos estos errores.
+           *
+           * El lector los genera continuamente
+           * mientras busca un QR.
+           */
+
+        }
+
+      )
+
+      .then(function() {
+
+        camaraActiva = true;
+
+
+        document.getElementById(
+          "btnCamara"
+        ).style.display =
+          "none";
+
+
+        console.log(
+          "✅ Cámara activada."
+        );
+
+      })
+
+      .catch(function(error) {
+
+        console.error(
+          "❌ Error cámara:",
+          error
+        );
+
+
+        document.getElementById(
+          "btnCamara"
+        ).disabled = false;
+
+
+        document.getElementById(
+          "btnCamara"
+        ).textContent =
+          "📷 ACTIVAR CÁMARA";
+
+
+        mostrarError(
+          "No fue posible abrir la cámara. " +
+          "Revisa que el navegador tenga permiso para utilizarla."
+        );
+
+      });
+
+  }
+
+
+  /* =========================================================
+     DETENER CAMARA
+     ========================================================= */
+
+  function detenerCamara() {
+
+    if (
+      lectorQR &&
+      camaraActiva
+    ) {
+
+      lectorQR
+        .stop()
+
+        .then(function() {
+
+          camaraActiva = false;
+
+          console.log(
+            "Cámara detenida."
+          );
+
+        })
+
+        .catch(function(error) {
+
+          console.log(
+            "Error deteniendo cámara:",
+            error
+          );
+
+          camaraActiva = false;
+
+        });
+
+    }
+
+  }
+
+
+  /* =========================================================
+     PROCESAR QR
+     ========================================================= */
+
+  function procesarQR(
+    texto
+  ) {
+
+    console.log(
+      "Procesando información:"
+    );
+
+    console.log(
+      texto
+    );
+
+
+    try {
+
+      let datos = null;
+
+
+      /*
+       * CASO 1
+       *
+       * El QR contiene directamente JSON.
+       *
+       * Ejemplo:
+       *
+       * {"id":"MK001",...}
+       */
+
+      if (
+        texto.trim().startsWith("{")
+      ) {
+
+        datos =
+          JSON.parse(texto);
+
+      }
+
+
+      /*
+       * CASO 2
+       *
+       * El QR contiene nuestra URL:
+       *
+       * ...?data={JSON}
+       */
+
+      else {
+
+        const url =
+          new URL(texto);
+
+
+        const data =
+          url.searchParams.get(
+            "data"
+          );
+
+
+        if (!data) {
+
+          throw new Error(
+            "No se encontró información en el QR."
+          );
+
+        }
+
+
+        datos =
+          JSON.parse(data);
+
+      }
+
+
+      console.log(
+        "DATOS OBTENIDOS:"
+      );
+
+      console.log(
+        datos
+      );
+
+
+      /*
+       * VALIDAR ID
+       */
+
+      if (
+        !datos ||
+        !datos.id
+      ) {
+
+        throw new Error(
+          "El QR no contiene un ID MKIDS."
+        );
+
+      }
+
+
+      datosQR =
+        datos;
+
+
+      /*
+       * MOSTRAR INFORMACION
+       */
+
+      document.getElementById(
+        "id"
+      ).textContent =
+        datos.id || "-";
+
+
+      document.getElementById(
+        "nombre"
+      ).textContent =
+        datos.nombre || "-";
+
+
+      document.getElementById(
+        "acudiente"
+      ).textContent =
+        datos.acudiente || "-";
+
+
+      document.getElementById(
+        "edad"
+      ).textContent =
+        datos.edad || "-";
+
+
+      document.getElementById(
+        "sangre"
+      ).textContent =
+        datos.sangre || "-";
+
+
+      document.getElementById(
+        "eps"
+      ).textContent =
+        datos.eps || "-";
+
+
+      document.getElementById(
+        "condicion"
+      ).textContent =
+        datos.condicion || "Ninguna";
+
+
+      /*
+       * CONDICION MEDICA
+       */
+
+      const bloqueCondicion =
+        document.getElementById(
+          "bloqueCondicion"
+        );
+
+
+      bloqueCondicion.classList.remove(
+        "alerta"
+      );
+
+
+      const condicion =
+        String(
+          datos.condicion ||
+          "Ninguna"
+        )
+        .trim()
+        .toLowerCase();
+
+
+      if (
+        condicion !== "" &&
+        condicion !== "ninguna" &&
+        condicion !== "no"
+      ) {
+
+        bloqueCondicion.classList.add(
+          "alerta"
+        );
+
+      }
+
+
+      /*
+       * CAMBIAR PANTALLA
+       */
+
+      document.getElementById(
+        "zonaScanner"
+      ).style.display =
+        "none";
+
+
+      document.getElementById(
+        "error"
+      ).style.display =
+        "none";
+
+
+      document.getElementById(
+        "contenido"
+      ).style.display =
+        "block";
+
+
+      console.log(
+        "✅ Información mostrada."
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "❌ Error procesando QR:",
+        error
+      );
+
+
+      mostrarError(
+        error.message ||
+        "No fue posible leer el código QR."
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     NUEVO QR
+     ========================================================= */
+
+  function nuevoQR() {
+
+    console.log(
+      "Preparando nuevo escaneo."
+    );
+
+
+    datosQR = null;
+
+    procesandoQR = false;
+
+
+    /*
+     * Limpiar mensaje.
+     */
+
+    document.getElementById(
+      "mensaje"
+    ).style.display =
+      "none";
+
+
+    /*
+     * Limpiar condición.
+     */
+
+    document.getElementById(
+      "bloqueCondicion"
+    ).classList.remove(
+      "alerta"
+    );
+
+
+    /*
+     * Mostrar escáner.
+     */
+
+    document.getElementById(
+      "contenido"
+    ).style.display =
+      "none";
+
+
+    document.getElementById(
+      "error"
+    ).style.display =
+      "none";
+
+
+    document.getElementById(
+      "zonaScanner"
+    ).style.display =
+      "block";
+
+
+    /*
+     * Activar cámara.
+     */
+
+    activarCamara();
+
+  }
+
+
+  /* =========================================================
+     REGISTRAR
+     
+     POR AHORA NO GUARDA.
+     
+     En este primer paso solo mostramos un mensaje.
+     
+     En el siguiente paso conectaremos esto con
+     Google Apps Script.
+     ========================================================= */
+
+  function registrar(
+    movimiento
+  ) {
+
+    console.log(
+      "Movimiento seleccionado:",
+      movimiento
+    );
+
+
+    if (
+      !datosQR ||
+      !datosQR.id
+    ) {
+
+      mostrarMensaje(
+        "No existe un ID válido.",
+        false
+      );
+
+      return;
+
+    }
+
+
+    mostrarMensaje(
+
+      movimiento +
+      " seleccionado para " +
+      datosQR.nombre +
+      ".",
+
+      true
+
+    );
+
+
+    /*
+     * NO GUARDAMOS TODAVÍA.
+     *
+     * Primero comprobamos que GitHub + cámara + QR
+     * funcionan correctamente.
+     */
+
+  }
+
+
+  /* =========================================================
+     MENSAJE
+     ========================================================= */
+
+  function mostrarMensaje(
+    texto,
+    correcto
+  ) {
+
+    const mensaje =
+      document.getElementById(
+        "mensaje"
+      );
+
+
+    mensaje.textContent =
+      texto;
+
+
+    mensaje.className =
+      correcto
+        ? "exito"
+        : "errorMensaje";
+
+
+    mensaje.style.display =
+      "block";
+
+  }
+
+
+  /* =========================================================
+     ERROR
+     ========================================================= */
+
+  function mostrarError(
+    texto
+  ) {
+
+    const error =
+      document.getElementById(
+        "error"
+      );
+
+
+    error.textContent =
+      texto;
+
+
+    error.style.display =
+      "block";
+
+  }
+
+
+</script>
+
+
+</body>
+</html>
